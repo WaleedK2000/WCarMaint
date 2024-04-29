@@ -40,4 +40,10 @@ router.get("/getCars", async (req, res) => {
   res.status(200).json(cars);
 });
 
+// route to get cars by owner
+router.get("/getCars/owner/:ownerId", async (req, res) => {
+  const cars = await Car.find({ owner: req.params.ownerId });
+  res.status(200).json(cars);
+});
+
 module.exports = router;

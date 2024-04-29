@@ -20,8 +20,12 @@ router.post("/login", async (req, res) => {
       if (!isMatch) {
         res.status(401).json({ message: "Invalid email or password" });
       } else {
-        const token = jwt.sign({ userId: user._id }, "secretKey", { expiresIn: "1h" });
-        res.status(200).json({ message: "User logged in successfully", user, token });
+        const token = jwt.sign({ userId: user._id }, "secretKey", {
+          expiresIn: "1h",
+        });
+        res
+          .status(200)
+          .json({ message: "User logged in successfully", user, token });
       }
     }
   } catch (error) {
@@ -57,6 +61,11 @@ router.post("/signup", async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Failed to create user" });
   }
+});
+
+router.get("/getUsers", async (req, res) => {
+  const users = await User.find();
+  res.status(200).json(users);
 });
 
 module.exports = router;
