@@ -23,9 +23,23 @@ router.post("/login", async (req, res) => {
         const token = jwt.sign({ userId: user._id }, "secretKey", {
           expiresIn: "1h",
         });
+
+        const refreshToken = jwt.sign(
+          { userId: user._id },
+          "refreshSecretKey",
+          {
+            expiresIn: "7d",
+          }
+        );
+
         res
           .status(200)
-          .json({ message: "User logged in successfully", user, token });
+          .json({
+            message: "User logged in successfully",
+            user,
+            token,
+            refreshToken,
+          });
       }
     }
   } catch (error) {
