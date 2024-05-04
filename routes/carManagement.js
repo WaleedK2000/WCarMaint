@@ -11,16 +11,17 @@ router.get("/", async (req, res) => {
 // route to add a car
 
 router.post("/addCar", async (req, res) => {
-  const { email } = req.body;
+  const { owner } = req.body;
 
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ owner });
 
   if (!user) {
     res.status(401).json({ message: "Invalid email or password" });
   } else {
-    ownerId = user._id;
+    let ownerId = user._id;
 
     const car = await Car.create({
+      registrationNumber: req.body.registrationNumber,
       make: req.body.make,
       model: req.body.model,
       year: req.body.year,
@@ -28,9 +29,35 @@ router.post("/addCar", async (req, res) => {
       mileage: req.body.mileage,
       owner: user._id,
     });
+    res.status(200).json({ message: "Car added successfully", req: req.body });
   }
+});
 
-  res.status(200).json({ message: "Car added successfully", req: req.body });
+// route to modify a car
+router.put("/modifyCar/:carId", async (req, res) => {
+  const { carId } = req.params;
+  const { registrationNumber, make, model, year, color, mileage } = req.body;
+
+  try {
+    const car = await Car.findById(carId);
+
+    if (!car) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    car.registrationNumber = registrationNumber || car.registrationNumber;
+    car.make = make || car.make;
+    car.model = model || car.model;
+    car.year = year || car.year;
+    car.color = color || car.color;
+    car.mileage = mileage || car.mileage;
+
+    await car.save();
+
+    res.status(200).json({ message: "Car modified successfully", car });
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 // route to get all cars
